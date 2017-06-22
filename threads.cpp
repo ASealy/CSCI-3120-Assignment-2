@@ -6,7 +6,10 @@
 using namespace std;
 
 char sudoku_array [9][9]={0};
-int all_threads_valid[11]={0};
+static int all_threads_valid[11]={0};
+
+
+
 
 struct parameters
 {
@@ -16,43 +19,75 @@ struct parameters
 
 void *RowChecker(void *params) {
    int is_valid=1;
-   struct parameters *stucture;
-   stucture = (struct parameters *) params;
+   struct parameters *structure;
+   structure = (struct parameters *) params;
 	for(int i=0;i<9;i++){
 	int columnsArray[9]={0};
 		for(int j=0;j<9;j++){
 			columnsArray[(int)sudoku_array[i][j]-49]=1;
-				cout << sudoku_array[i][j];		
+				//cout << sudoku_array[i][j];		
 		}
 		for(int j=0;j<9;j++){
-			cout << columnsArray[j];
+			//cout << columnsArray[j];
 			if(columnsArray[j]==0) is_valid=0;
 		}
 	
 	}
 	if(is_valid==1) all_threads_valid[0]=1;
+
+
+	
+
+
+
    pthread_exit(NULL);
 }
 
 void *ColumnChecker(void *params) {
    int is_valid=1;
-   struct parameters *stucture;
-   stucture = (struct parameters *) params;
+   struct parameters *structure;
+   structure = (struct parameters *) params;
 	for(int i=0;i<9;i++){
-	int columnsArray[9]={0};
+	int rowsArray[9]={0};
 		for(int j=0;j<9;j++){
-			columnsArray[(int)sudoku_array[j][i]-49]=1;
-				cout << sudoku_array[j][i];		
+			rowsArray[(int)sudoku_array[j][i]-49]=1;
+				//cout << sudoku_array[j][i];		
 		}
 		for(int j=0;j<9;j++){
-			cout << columnsArray[j];
-			if(columnsArray[j]==0) is_valid=0;
+			//cout << columnsArray[j];
+			if(rowsArray[j]==0) is_valid=0;
 		}
 	
 	}
-	if(is_valid==1) all_threads_valid[0]=1;
+	if(is_valid==1) all_threads_valid[1]=1;
    pthread_exit(NULL);
 }
+
+void *ThreeByThreeChecker(void *params) {
+   int is_valid=1;
+   struct parameters *structure;
+   structure = (struct parameters *) params;
+
+	int gridArray[9]={0};
+	for(int i=structure->row;i<structure->row+3;i++){
+      		for(int j=structure->column;j<structure->column+3;j++){
+			gridArray[(int)sudoku_array[i][j]-49]=1;
+			cout << sudoku_array[i][j];			
+		}
+	}
+
+	for(int i=0;i<9;i++){
+		if(gridArray[i]==0) is_valid=0;
+	}
+		
+	
+	if(is_valid==1) all_threads_valid[2]=1;
+   pthread_exit(NULL);
+
+
+}
+
+
 
 
 
@@ -77,26 +112,35 @@ int main (int argc, char** argv) {
          cout << sudoku_array[i][j];
       }cout << "\n";
    }
-cout << endl;
 
 
 
 
+   pthread_t thread;
+   struct parameters p;
+   p.row = 0;
+   p.column = 0;
+   int rc = pthread_create(&thread, NULL, RowChecker, (void *)&p);
+
+
+   
+
+   p.row = 0;
+   p.column = 0;
+   rc = pthread_create(&thread, NULL, ColumnChecker, (void *)&p);
 
 
 
-   pthread_t thread_1;
-   struct parameters p_1;
-   p_1.row = 0;
-   p_1.column = 0;
-   int rc = pthread_create(&thread_1, NULL, RowChecker, (void *)&p_1);
 
+   p.row = 0;
+   p.column = 0;
+   rc = pthread_create(&thread, NULL, ThreeByThreeChecker, (void *)&p);
+	
 
-    pthread_t thread_2;
-   struct parameters p_2;
-   p_2.row = 0;
-   p_2.column = 0;
-   rc = pthread_create(&thread_2, NULL, ColumnChecker, (void *)&p_2);
+	cout << endl;
+	for(int i=0;i<11;i++) cout << all_threads_valid[i];
+
+	cout << endl;
 
 
    pthread_exit(NULL);
@@ -109,3 +153,8 @@ cout << endl;
 
    
 }
+
+
+
+
+
