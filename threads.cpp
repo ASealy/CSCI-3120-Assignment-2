@@ -47,8 +47,8 @@ void *RowChecker(void *params) {
       if(all_threads_valid[i]==0) valid_sudoku=1;
    }
    //if the other regions are valid, print a valid message, otherwise print an invalid message 
-   if(valid_sudoku==0) cout << "This sudoku solution is valid!" <<endl;
-   else cout << "This sudoku solution is NOT valid!" <<endl;
+   if(valid_sudoku==0) cout << endl << "This sudoku solution is valid!" << endl << endl;
+   else cout << endl <<"This sudoku solution is NOT valid!" << endl << endl;
 }
 
 
